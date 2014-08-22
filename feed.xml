@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title></title>
+    <link>http://swilson.co.uk</link>
+    <atom:link href="http://swilson.co.uk/feed.xml" rel="self" type="application/rss+xml" />
+    <description></description>
+    <language>en-us</language>
+    <pubDate>Fri, 22 Aug 2014 22:15:33 +0000</pubDate>
+    <lastBuildDate>Fri, 22 Aug 2014 22:15:33 +0000</lastBuildDate>
+
+    
+    
+    <item>
+      <title>Quick tip: Adding NPM dependencies</title>
+      <link>http://swilson.co.uk/blog/2014/08/21/adding-npm-dependencies/</link>
+      <pubDate>Thu, 21 Aug 2014 00:00:00 +0000</pubDate>
+      <author></author>
+      <guid>http://swilson.co.uk/blog/2014/08/21/adding-npm-dependencies</guid>
+      <description>&lt;p&gt;Just a quick tip. If you’re learning node you don’t usually see this on the tutorials, so you might not know it. When you install a new NPM dependency for your project, like this&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;$ npm install module&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Then you also need to manually add it to package.json, so that anyone else can run npm install and run your code. You need to manually figure out which version(s) your project depends on. Instead try&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;$ npm install module --save&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Which adds the dependency to package.json automatically. Nice.&lt;/p&gt;
+</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>WDCNZ Mega-Brief Summary</title>
+      <link>http://swilson.co.uk/blog/2014/08/14/wdcnz-mega-brief/</link>
+      <pubDate>Thu, 14 Aug 2014 00:00:00 +0000</pubDate>
+      <author></author>
+      <guid>http://swilson.co.uk/blog/2014/08/14/wdcnz-mega-brief</guid>
+      <description>&lt;p&gt;Last month I went to the Wellington web dev conference &lt;a href=&quot;http://wdcnz.co.nz&quot;&gt;WDCNZ&lt;/a&gt; and it was truely awesome. The main themes that stood out are these:&lt;/p&gt;
+
+&lt;h4 id=&quot;design-your-things-in-small-bits&quot;&gt;Design your things in small bits&lt;/h4&gt;
+&lt;p&gt;Be they components, modules, packages or plugins, you should architecture your things in a way that allows bits to be easily added and replaced. In javascript (the language of the moment), this is made easy by NPM, require.js and common.js. Microservices weren’t actually mentioned, but they’re very popular at the moment and another example of the same philosophy. &lt;a href=&quot;https://twitter.com/substack&quot;&gt;James Halliday&lt;/a&gt; showed us a range of modular tools on the command line and in NPM, and &lt;a href=&quot;https://twitter.com/MarkDalgleish&quot;&gt;Mark Dalgliesh&lt;/a&gt; took us through the modular ecosystem he created around Bespoke.js.&lt;/p&gt;
+
+&lt;h4 id=&quot;everyone-is-using-node&quot;&gt;Everyone is using Node&lt;/h4&gt;
+&lt;p&gt;In a city which superficially appears to use only .NET and Java, almost every speaker was using Node either for their job, their side projects, their robots, or in some cases just for their slides. Browserify means node modules can work on the browser too, so “javascript” means “node” now.&lt;/p&gt;
+
+&lt;h4 id=&quot;build-yourself-some-awesome-hardware-and-programme-it&quot;&gt;Build yourself some awesome hardware and programme it&lt;/h4&gt;
+&lt;p&gt;This was made to look easier than you might think. Get some random lights or motors, connect them to an Arduino, glue on a Rasberry Pi to provide a wifi link and/or web interface, and the rest is just code. We saw &lt;a href=&quot;https://twitter.com/sarajchipps&quot;&gt;Sara Chipps&lt;/a&gt;’ programmable jewellery and &lt;a href=&quot;https://twitter.com/sehsarah&quot;&gt;Sarah Hui&lt;/a&gt;’s nodebot in action.&lt;/p&gt;
+
+&lt;p&gt;Other highlights were &lt;a href=&quot;https://twitter.com/antiheroine&quot;&gt;Jen Myers&lt;/a&gt;’ vision of anti-expertism in the industry, and the sheer blistering pace of &lt;a href=&quot;https://twitter.com/substack&quot;&gt;James Halliday&lt;/a&gt;’s live code demos.&lt;/p&gt;
+
+&lt;p&gt;Look out for a more detailed review coming up on the &lt;a href=&quot;http://www.softwire.com/blog&quot;&gt;Softwire blog&lt;/a&gt; soon!&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/lanyard.jpg&quot; alt=&quot;Proof I was there&quot; /&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    
+
+  </channel> 
+</rss>
