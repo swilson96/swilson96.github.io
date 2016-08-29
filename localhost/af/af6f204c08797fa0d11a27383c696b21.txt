@@ -1,0 +1,1 @@
+a:5:{s:5:"value";a:2:{s:9:"Main Book";O:28:"NewsUK\Utilities\BookDetails":2:{s:11:"displayName";s:9:"Main Book";s:2:"id";s:6:"120228";}s:6:"Times2";O:28:"NewsUK\Utilities\BookDetails":2:{s:11:"displayName";s:6:"Times2";s:2:"id";s:6:"120240";}}s:10:"write_time";i:1469528418;s:10:"expired_in";i:157680000;s:12:"expired_time";i:1627208418;s:4:"size";i:226;}

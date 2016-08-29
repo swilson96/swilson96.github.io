@@ -1,0 +1,380 @@
+<?xml version="1.0"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Simon Wilson</title>
+    <link>http://swilson.co.uk</link>
+    <atom:link href="http://swilson.co.uk/feed.xml" rel="self" type="application/rss+xml" />
+    <description>Web developer, project manager, ex-Londoner enjoying life in New Zealand</description>
+    <language>en-us</language>
+    <pubDate>Mon, 29 Aug 2016 14:30:58 +0000</pubDate>
+    <lastBuildDate>Mon, 29 Aug 2016 14:30:58 +0000</lastBuildDate>
+
+    
+    
+    <item>
+      <title>Using git-tfs in anger</title>
+      <link>http://swilson.co.uk/blog/2016/05/25/git-tfs/</link>
+      <pubDate>Wed, 25 May 2016 00:00:00 +0000</pubDate>
+      <author>simon.wilson@softwire.com (Simon Wilson)</author>
+      <guid>http://swilson.co.uk/blog/2016/05/25/git-tfs</guid>
+      <description>&lt;p&gt;A while ago I wrote about how &lt;a href=&quot;/blog/2015/11/08/never-use-tfs/&quot;&gt;no-one should ever user TFS, ever&lt;/a&gt;. While I was unfortunately forced to use it I experimented with &lt;a href=&quot;http://git-tfs.com/&quot;&gt;git-tfs&lt;/a&gt; to see if it would ease my pain, and this is what I found.&lt;/p&gt;
+
+&lt;h1 id=&quot;why-git-tfs&quot;&gt;Why git-tfs&lt;/h1&gt;
+&lt;p&gt;It seems to be the main git-to-tfs-bridge right now. There’s another option, &lt;a href=&quot;https://gittf.codeplex.com/&quot;&gt;git-tf&lt;/a&gt;, but that one hasn’t been updated since 2013. git-tfs appears to be an active project.&lt;/p&gt;
+
+&lt;h1 id=&quot;the-good&quot;&gt;The Good&lt;/h1&gt;
+&lt;ul&gt;
+  &lt;li&gt;Local version control: local commits and local branches. Proper branches (not TFS folder-branches) which are lightning-fast to switch between, and you can cherry-pick between.&lt;/li&gt;
+  &lt;li&gt;Rebase temporary dev branches back onto master instead of clumsily re-applying old shelvesets.&lt;/li&gt;
+  &lt;li&gt;If more than one person is using it, push and pull git branches between yourselves, and keep developing even when the central TFS server (inevitably) goes down.&lt;/li&gt;
+  &lt;li&gt;Separate source control from Visual Studio: generally a good idea in my opinion, and particularly useful if VS is already running slowly.&lt;/li&gt;
+  &lt;li&gt;Reliable version control: TFS get-latest is a bit buggy, but git-TFS seemd to work reliably. Perhaps it abstracts away for you the tedium of always telling TFS explicitly to get the latest version of all files, not just some.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1 id=&quot;the-bad&quot;&gt;The Bad&lt;/h1&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;You can only checkout one directory at a time so you need separate checkouts for different root-level projects in the same repo. This is pretty minor though.&lt;/li&gt;
+  &lt;li&gt;Visual Studio gets a bit confused and integration isn’t as good. Keep it happy by using msys git (git for windows) not cygwin git if you can.&lt;/li&gt;
+  &lt;li&gt;Changing between TFS and git-tfs, or just using visual studio with a git-tfs checkout, leads to corrupt TFS workspaces.&lt;/li&gt;
+  &lt;li&gt;Doing things differently from the rest of the team means you lose out on their TFS knowledge and support, for what it’s worth.&lt;/li&gt;
+  &lt;li&gt;You won’t be able to add projects to the solution properly.&lt;/li&gt;
+  &lt;li&gt;Visual Studio will constantly try to remove the tfs element from the .sln file, which will break TFS integration for everyone else if you commit it.&lt;/li&gt;
+  &lt;li&gt;If you need to keep local changes, e.g. for local environment config, then it’s a pain to stash the changes all the time (you need a clean checkout to rebase).&lt;/li&gt;
+  &lt;li&gt;It’s just really slow - mainly because my team’s TFS server was slow; but git-tfs was even slower.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1 id=&quot;verdict&quot;&gt;Verdict&lt;/h1&gt;
+
+&lt;p&gt;For me, unfortunately the disadvantages don’t outweight the advantages, and I probably wouldn’t use it again. it’s a bit of a pain to set it up and to use different tools to the rest of the team. On my next TFS project (and I’ll do everything in my power to make sure there won’t be one) I’ll just embrace the shelveset workflow instead.&lt;/p&gt;
+
+&lt;p&gt;What I might try is just to &lt;code&gt;git init&lt;/code&gt; a local repo in my TFS checkout and get local branching that way, adding the .git folder etc to the local ignore list, although it might lead to some manual effort keeping branches in sync with the remote.&lt;/p&gt;
+
+&lt;h1 id=&quot;setting-up&quot;&gt;Setting up&lt;/h1&gt;
+&lt;p&gt;If you do decide to use it, this is what I did to set it up:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Install git, and configure it:&lt;/li&gt;
+
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;git config --global core.autocrlf &lt;span class=&quot;nb&quot;&gt;true&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# see https://help.github.com/articles/dealing-with-line-endings/&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;git config --global core.filemode &lt;span class=&quot;nb&quot;&gt;false&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+		
+&lt;li&gt;Install git-tfs: &lt;a href=&quot;http://git-tfs.com/&quot;&gt;http://git-tfs.com/&lt;/a&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;a href=&quot;https://github.com/git-tfs/git-tfs/blob/master/doc/commands/clone.md&quot;&gt;Clone&lt;/a&gt; the repo:&lt;/li&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;git tfs clone http://tfs:8080/tfs/DefaultCollection &lt;span class=&quot;nv&quot;&gt;$/&lt;/span&gt;some_project -c XXX&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;/ol&gt;
+
+&lt;p&gt;Where XXX is a recent changeset - you’ll only have history available from this changeset, but the further back you go the longer the clone will take.&lt;/p&gt;
+
+&lt;ol start=&quot;4&quot;&gt;
+&lt;li&gt;Open in Visual Studio!&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Don’t bother to un-map your workspace: the Visual Studio TFS integration will go away when you open your new “git” project.
+And it will be easier to go back to pure TFS if you want to.&lt;/p&gt;
+
+&lt;h1 id=&quot;everyday-use&quot;&gt;Everyday Use&lt;/h1&gt;
+&lt;p&gt;Always rebase when pulling:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;git tfs pull --rebase&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;To map local commits to checkins one to one, use &lt;a href=&quot;https://github.com/git-tfs/git-tfs/blob/master/doc/commands/rcheckin.md&quot;&gt;rcheckin&lt;/a&gt; instead of &lt;a href=&quot;https://github.com/git-tfs/git-tfs/blob/master/doc/commands/checkin.md&quot;&gt;checkin&lt;/a&gt; or &lt;a href=&quot;https://github.com/git-tfs/git-tfs/blob/master/doc/commands/checkintool.md&quot;&gt;checkintool&lt;/a&gt;.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;git tfs rcheckin --no-merge&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Be careful though, this makes a number of commits in a row,
+and because TFS is so sloooow the can be nearly a minute apart and trigger more than one consecutive CI build.
+If the build time is slow this might hold other people up from committing, so keep an eye on it: you can always cancel the first build(s) if this happens.
+You might just want to squash up the commits to save time committing!&lt;/p&gt;
+
+&lt;p&gt;If your project requires certain custom notes fields to be supplied, use the &lt;code&gt;-n&lt;/code&gt; (&lt;code&gt;--notes&lt;/code&gt;) argument to supply it from the command line:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;git tfs rcheckin --no-merge -n &lt;span class=&quot;s1&quot;&gt;&amp;#39;JiraNumber&amp;#39;&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&amp;#39;AA-123&amp;#39;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Never Use TFS</title>
+      <link>http://swilson.co.uk/blog/2015/11/08/never-use-tfs/</link>
+      <pubDate>Sun, 08 Nov 2015 00:00:00 +0000</pubDate>
+      <author>simon.wilson@softwire.com (Simon Wilson)</author>
+      <guid>http://swilson.co.uk/blog/2015/11/08/never-use-tfs</guid>
+      <description>&lt;p&gt;I’ve just spent three months using TFS, for the first  time, on an enterprise scale project, and I’ve come to the conclusion that TFS should never be used ever. I’m specifically talking about TFS as version control (TFVC), but based on my experience there, I can only assume the rest of it is rubbish too. This is why:&lt;/p&gt;
+
+&lt;h1 id=&quot;substandard&quot;&gt;Substandard&lt;/h1&gt;
+&lt;ul&gt;
+  &lt;li&gt;There are no local commits or local branches! Git allowed us to use version control for our individual work when it arrived in 2005. In 2015 it’s ridiculous that I can’t version and branch my local changes. Ok, I can shelve my changes instead of committing or branching locally, but you can’t collaborate on shelvesets. You can’t cherry-pick between different shelvesets. You can’t add a shelveset on top of shelveset and maintain the distinction.&lt;/li&gt;
+  &lt;li&gt;No cherry-picking between branches, and it’s oddly difficult to apply a shelveset to a different branch.&lt;/li&gt;
+  &lt;li&gt;TFS thinks things have changed even when I’ve changed them back to exactly how they were, cluttering my commit: this seems to be based on the timestamp of last change, not on the actual difference&lt;/li&gt;
+  &lt;li&gt;Only one repo: can’t commit demos, examples, other resources (maybe commit to \Documents?)&lt;/li&gt;
+  &lt;li&gt;Not distribute, so you only need one server to go down and work comes to a standstill. Compounding this is the fact that if you have your workspace on the server rather than local (and there are various reasons you might do this) then visual studio wants to talk to the server all the time, and things really slow down if it isn’t reachable.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1 id=&quot;ridiculously-tight-coupling-with-visual-studio&quot;&gt;Ridiculously tight coupling with Visual Studio&lt;/h1&gt;
+&lt;ul&gt;
+  &lt;li&gt;TFS doesn’t know about changes made other than through Visual Studio - so if you want to use other tools to manipulate files, you risk losing those changes, or confusing TFS.&lt;/li&gt;
+  &lt;li&gt;Analysts, testers, designers or other non-devs need to use Visual Studio to use it, requiring even more money on licences.&lt;/li&gt;
+  &lt;li&gt;Slows Visual Studio down quite a bit, and sometimes crashes it.&lt;/li&gt;
+  &lt;li&gt;You need to link each project to TFS explicitly, which means Visual Studio will make and maintain changes to the solution file which specify the source control being used. I don’t think code and source control should be coupled like this, and it makes it hard to use any other client than visual studio.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1 id=&quot;default-diff-and-merge-engine-both-suck&quot;&gt;Default diff and merge engine both suck&lt;/h1&gt;
+&lt;p&gt;&lt;a href=&quot;http://blogs.msdn.com/b/jmanning/archive/2006/02/20/diff-merge-configuration-in-team-foundation-common-command-and-argument-values.aspx&quot;&gt;But at least you can replace it with e.g. tortoise diff/merge.&lt;/a&gt;
+Even once you’ve done this, there doesn’t seem to be a way to view whitespace changes (regardless of the diff engine you choose)&lt;/p&gt;
+
+&lt;h1 id=&quot;unreliable&quot;&gt;Unreliable&lt;/h1&gt;
+&lt;ul&gt;
+  &lt;li&gt;Getting latest won’t overwrite local changes nor will it replace files which think they are the latest version. So if someone made a change to a file you are working on, you can easily overwrite their change when you next commit, and never realise.&lt;/li&gt;
+  &lt;li&gt;Getting latest for a single file (or subset of files) will make it think all files are up to date because it looks at the timestamp of the most recent get. Note: I haven’t verified this and it’s hard to recreate reliably, but it is widely reported on the web, and I saw it happen once or twice to certain files. You’ll notice it is the habit of anyone who has used TFS for more than a few months to always update all files at once and using the “get specific version -&amp;gt; latest version” option, because they have learnt not to trust TFS.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1 id=&quot;branches-suck-dangerously-hard&quot;&gt;Branches suck dangerously hard&lt;/h1&gt;
+&lt;ul&gt;
+  &lt;li&gt;Switching and merging branches is slow and conflict-ridden, probably worse than SVN, hence the need for “shelvesets” to exist&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://msdn.microsoft.com/en-us/library/ms181425.aspx&quot;&gt;Any and all folders can be branched independently!&lt;/a&gt; This is extremely dangerous unless handled very carefully - some parts of your code might be on a different branch to other parts, and some parts may contain branch-specific changes but not actually be branched. You could argue that it makes for a lot of flexibility, but I’ve only ever seen it cause chaos.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1 id=&quot;peer-review-workflow&quot;&gt;Peer Review Workflow&lt;/h1&gt;
+&lt;p&gt;TFS doesn’t integrate with Crucible or many other decent review tools, so you’re kind of stuck with the built in TFS tool. Fortunately, the review tool is generally very good, with a few drawbacks:
+* You need a Visual Studio Ultimate licence to do reviews in Visual Studio. You can do them on the web instead, but… 
+* Web comments don’t show in Visual Studio reviews and vice versa
+* If you don’t have the VS licence, you can’t be invited to reviews, so there’s an extra manual “send an email” step for everyone
+* Can’t add multiple revisions to the same review, or create a review for the changes since the last review - this is partly due to the limited nature of shelvesets&lt;/p&gt;
+
+&lt;h1 id=&quot;other-issues&quot;&gt;Other Issues&lt;/h1&gt;
+&lt;ul&gt;
+  &lt;li&gt;CI build failure reports don’t link to the relevant changeset(s). (Well ok, the web pages do, but you have to hunt. Emails don’t.)&lt;/li&gt;
+  &lt;li&gt;TFS doesn’t delete empty folders, which leaves clutter&lt;/li&gt;
+  &lt;li&gt;Can’t specify lock-before-edit rules for e.g. only documents, or with a local workspace&lt;/li&gt;
+  &lt;li&gt;Users are closely tied to Active Directory: so you lose all the history when migrating to a new AD system&lt;/li&gt;
+  &lt;li&gt;There is little or no rescue from git clients like Git-TFS, which give you local commits and branches, but have other downsides because of the strange quirks of TFS. I’ll go into my experience with Git-TFS in &lt;a href=&quot;/blog/2016/05/25/git-tfs/&quot;&gt;a later blog post&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1 id=&quot;pros&quot;&gt;PROS&lt;/h1&gt;
+
+&lt;p&gt;But wait, there must be some good things about TFS? These are the ones I can think of…&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;It’s simple for analysts/testers, with nice easy GUI in VS: git might be too complex for some. But that means non-devs need a full clunky Visual Studio with the associated licence cost, just to check a few files into source control. And there are lots of gui tools for git now that make simple pull/commit/psuh workflows nice and easy for everyone.&lt;/li&gt;
+  &lt;li&gt;The Visual Studio integration is excellent, and peer reviews are good if you all have the same VS licence. But as discussed earlier, it slows down the IDE, divides the team unless everyone has the same licence, and means one tool does too much.&lt;/li&gt;
+  &lt;li&gt;You can commit a review directly from the shelveset, a bit like merging a pull request. This is a nice way to make sure what was reviewed is what gets committed. I’m not sure what happens if there are merge conflicts though. Anyway this can be achieved with a pull request system or a workflow like &lt;a href=&quot;https://code.google.com/p/gerrit/&quot;&gt;Gerrit&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>The specified named connection is either not found in the configuration, not intended to be used with the EntityClient provider, or not valid.</title>
+      <link>http://swilson.co.uk/blog/2015/09/04/entity-framework-connection-string/</link>
+      <pubDate>Fri, 04 Sep 2015 00:00:00 +0000</pubDate>
+      <author>simon.wilson@softwire.com (Simon Wilson)</author>
+      <guid>http://swilson.co.uk/blog/2015/09/04/entity-framework-connection-string</guid>
+      <description>&lt;p&gt;“The specified named connection is either not found in the configuration, not intended to be used with the EntityClient provider, or not valid.”&lt;/p&gt;
+
+&lt;p&gt;There are many possible causes of this error, but here’s one that caught me out.&lt;/p&gt;
+
+&lt;p&gt;A client recently had their hosting provider move their database for reasons I won’t go into, and they tried to keep the site working by replacing the connection strings in web.config with the config they thought would connect to the new database. There are two connection strings, one for the ASP.NET Membership stuff like logging in and managing users, and one for the application data, which is accessed through Entity Framework. This is what the config looked like when I was called in (sensitive bits changed, of course):&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-xml&quot; data-lang=&quot;xml&quot;&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;add&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;ApplicationServices&amp;quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;connectionString=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;Server=SQL-07; Database=db1; User Id=user_0001; Password=XXXX&amp;quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;providerName=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;System.Data.SqlClient&amp;quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;add&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;ApplicationDBEntities&amp;quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;connectionString=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;metadata=res://*/Models.ApplicationDBModel.csdl|res://*/Models.ApplicationDBModel.ssdl|res://*/Models.ApplicationDBModel.msl;provider=System.Data.SqlClient;provider connection string=&amp;amp;quot;Server=SQL-07; Database=db1; User Id=user_0001; Password=XXXX; MultipleActiveResultSets=True&amp;amp;quot;&amp;quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;providerName=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;System.Data.SqlClient&amp;quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Interestingly, you could go to the homepage, log in, and go to the user management screens. But if you tried to do anything else, e.g. view and of the EF entities, you would see this error:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/SmallEntityConnectionError.png&quot; alt=&quot;This error could mean a lot of things&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;So clearly the membership connection worked and the entity framework connection didn’t. I checked and double checked for differences but the server, username, password were all identical. I checked everything else in the connection string and it was all identical to the web.config when the app worked. I even got so desperate I tried messing around with the escaped quotes, replacing the escaped &quot; with unescaped single quotes and trying various combinations!&lt;/p&gt;
+
+&lt;p&gt;The culprit was the one thing I didn’t initially think to check: the ‘providerName’ element. Since it was the same in the broken connection as in the working one, it hardly looked suspicious! But an entity framework connection string element needs the provider name to be set as ‘System.Data.EntityClient’, and that’s why it thought the connection string was invalid.&lt;/p&gt;
+
+&lt;p&gt;So here’s the working config; the only thing changed is the ‘providerName’ at the end:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-xml&quot; data-lang=&quot;xml&quot;&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;add&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;ApplicationDBEntities&amp;quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;connectionString=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;metadata=res://*/Models.ApplicationDBModel.csdl|res://*/Models.ApplicationDBModel.ssdl|res://*/Models.ApplicationDBModel.msl;provider=System.Data.SqlClient;provider connection string=&amp;amp;quot;Server=SQL-07; Database=db1; User Id=user_0001; Password=XXXX; MultipleActiveResultSets=True&amp;amp;quot;&amp;quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;providerName=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;System.Data.EntityClient&amp;quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;In the end I spotted the problem by taking a step back, digging up the old web.config and taking a close look at everything that had changed, where previously I’d been focussing on just the DB connection details.&lt;/p&gt;
+</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Using TryUpdateModel in .NET MVC</title>
+      <link>http://swilson.co.uk/blog/2015/03/26/tryupdatemodel/</link>
+      <pubDate>Thu, 26 Mar 2015 00:00:00 +0000</pubDate>
+      <author>simon.wilson@softwire.com (Simon Wilson)</author>
+      <guid>http://swilson.co.uk/blog/2015/03/26/tryupdatemodel</guid>
+      <description>&lt;p&gt;In some legacy code I came across a controller that uses the built-in .NET controller method &lt;a href=&quot;https://msdn.microsoft.com/en-us/library/system.web.mvc.controller.tryupdatemodel(v=vs.100).aspx&quot;&gt;TryUpdateModel()&lt;/a&gt;. It rings a bell from some old MVC 2 tutorials but I don’t think I’ve ever seen it used in anger. So it raises two questions:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Is it good practice, or to be avoided?&lt;/li&gt;
+  &lt;li&gt;How do you unit test a controller that uses it? My early attempts were thwarted by errors such as “System.ArgumentNullException: Value cannot be null. Parameter name: controllerContext”.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Searching the internet and asking around the team didn’t provide any answers to either. Eventually I decided&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;It’s probably bad practice: if you are using TryUpdateModel or a similar method, then you’re likely to be exposing business objects or persisted entities in the view, and on a project of any size it’s a better practice to use a dedicated viewmodel (the Model-View-ViewModel pattern or &lt;a href=&quot;http://en.wikipedia.org/wiki/Model_View_ViewModel&quot;&gt;MVVM&lt;/a&gt;) then map that to your model explicitly. If must use reflection to map between viewmodels and other objects without lots of boilerplate code you could try &lt;a href=&quot;https://github.com/AutoMapper/AutoMapper&quot;&gt;AutoMapper&lt;/a&gt; or similar.&lt;/p&gt;
+
+    &lt;p&gt;There are security concerns as well: if you don’t give it a whitelist you are risking a “mass assignment” style vulnerability, a bit like the one that &lt;a href=&quot;http://blog.erratasec.com/2012/03/rubygithub-hack-translated.html&quot;&gt;github famously suffered in 2012&lt;/a&gt;. So if you do use it, at least use an overload that takes a whitelist of allowed parameters!&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;If, like me, you have this in legacy code and you need to create unit tests for it, then you need to do some mocking. This is what I came up with using Moq, based on a couple of StackOverflow posts:&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-csharp&quot; data-lang=&quot;csharp&quot;&gt;&lt;span class=&quot;c1&quot;&gt;// Value provider, for methods like TryUpdateModel&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;// http://stackoverflow.com/questions/530133/mocking-requirements-for-tryupdatemodel-in-asp-net-rc1&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;Controller&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ValueProvider&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;FormCollection&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ToValueProvider&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;// Mock controllerContext, for methods like TryUpdateModel&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;// http://stackoverflow.com/questions/32640/mocking-asp-net-mvc-controller-context&lt;/span&gt;
+&lt;span class=&quot;kt&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;request&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Mock&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;HttpRequestBase&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;();&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Setup&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;r&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;r&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;HttpMethod&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Returns&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;POST&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;kt&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mockHttpContext&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Mock&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;HttpContextBase&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;();&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;mockHttpContext&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Setup&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Returns&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Object&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;kt&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;controllerContext&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ControllerContext&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mockHttpContext&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Object&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;RouteData&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(),&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Mock&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ControllerBase&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;().&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Object&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;Controller&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ControllerContext&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;controllerContext&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;If you know of a cleaner solution, please let me know!&lt;/p&gt;
+</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Copying hashes from gitk to the clipboard in Windows</title>
+      <link>http://swilson.co.uk/blog/2014/10/02/copying-gitk-hashes-windows/</link>
+      <pubDate>Thu, 02 Oct 2014 00:00:00 +0000</pubDate>
+      <author>simon.wilson@softwire.com (Simon Wilson)</author>
+      <guid>http://swilson.co.uk/blog/2014/10/02/copying-gitk-hashes-windows</guid>
+      <description>&lt;p&gt;Do you use windows, cygwin, and git, and does gitk annoy you like crazy when you try to copy and paste commit hashes?&lt;/p&gt;
+
+&lt;p&gt;The solution is pretty simple: each time you need to copy a new hash to the clipboard, copy something &lt;em&gt;from a different field in gitk first&lt;/em&gt;. Any old text will do.&lt;/p&gt;
+
+&lt;p&gt;For a full explanation see &lt;a href=&quot;http://www.softwire.com/blog/2014/08/07/copying-sha-1-hashes-from-gitk-to-the-clipboard/&quot;&gt;my original post on the Softwire blog&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Alternatively, check out &lt;a href=&quot;http://www.sourcetreeapp.com/&quot;&gt;sourcetree&lt;/a&gt;, which could replace git gui and gitk altogether.&lt;/p&gt;
+
+</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Working remotely as part of a development team</title>
+      <link>http://swilson.co.uk/blog/2014/09/11/working-remotely-in-a-dev-team/</link>
+      <pubDate>Thu, 11 Sep 2014 00:00:00 +0000</pubDate>
+      <author>simon.wilson@softwire.com (Simon Wilson)</author>
+      <guid>http://swilson.co.uk/blog/2014/09/11/working-remotely-in-a-dev-team</guid>
+      <description>&lt;p&gt;A few people have asked about how I cope working with a team in not only another country but the polar opposite timezone. If you’re working from outside the office, with a team in another office, or from abroad, here are some quick tips. This is from a list I put together for other &lt;a href=&quot;http://www.softwire.com/&quot;&gt;Softwirists&lt;/a&gt;. If you have any other advice on how to make this situation work, let me know!&lt;/p&gt;
+
+&lt;h2 id=&quot;things-to-do-before-leaving-the-office-or-the-country&quot;&gt;Things to do before leaving the office, or the country&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Make sure you have a good (fast, portable) laptop&lt;/li&gt;
+  &lt;li&gt;If you don’t already have a good headset and webcam, grab them, or if you’re travelling light get them on arrival&lt;/li&gt;
+  &lt;li&gt;Try to foresee any large (&amp;gt;1GB) downloads that aren’t generally on the web: VM images if your project has a sandboxed dev environment; professional versions of IDEs like Visual Studio; big test DBs etc.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;working&quot;&gt;Working&lt;/h2&gt;
+&lt;p&gt;There are two problems really: working remotely, and working in a different timezone, although they are related and the symptoms are similar.&lt;/p&gt;
+
+&lt;h2 id=&quot;working-remotely&quot;&gt;Working remotely&lt;/h2&gt;
+&lt;p&gt;Working remotely is the easier of the two to solve, and well covered on the internet and at Softwire. So here are some tips:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Firstly, get your team to put everything in the cloud as much as possible: standups on hangouts, story progress in jira or pivotal tracker (or tool of your choice) not on a whiteboard, use hipchat for team comms, have an online calendar if necessary, all documentation on a wiki, docs on gdocs, etc etc etc.&lt;/li&gt;
+  &lt;li&gt;If you do use HipChat (or similar) for team comms, make sure that as much conversation as possible does happen in HipChat. It’s very easy for all the people in one office to have a face-to-face conversation which never gets recorded in HipChat, leaving the one remote-working team member completely clueless. Ideally use HipChat to have the conversation, but if that’s impossible then at least record the consequences somewhere and draw the rest of the team’s attention to it.&lt;/li&gt;
+  &lt;li&gt;Google Hangouts is great for team conversations, and seems a bit more robust and reliable over long distances than skype&lt;/li&gt;
+  &lt;li&gt;Skype is also great for video calls or international phone calls&lt;/li&gt;
+  &lt;li&gt;Microsoft Lync doesn’t seem to work very well in my experience once you’re outside the office.&lt;/li&gt;
+  &lt;li&gt;Join.me is pretty good for presentations or sharing a desktop&lt;/li&gt;
+  &lt;li&gt;Screenhero is pretty good for sharing a desktop but also for pairing or pair-debugging remotely&lt;/li&gt;
+  &lt;li&gt;If you use lots of apps that use the webcam (e.g. using hangouts and sqwiggle at the same time) install “manycam” which controls your webcam and can then send the same image to multiple apps. It also has fun effects like moustaches etc. This is mainly if you use sqwiggle, which works best if left on all day in the background.&lt;/li&gt;
+  &lt;li&gt;Hipchat is great as a persistent team chatroom or rooms&lt;/li&gt;
+  &lt;li&gt;Sqwiggle is worth a look if you have a distributed team. It’s weird, but I think once you’re used to it then it’s good for fostering a team feeling rather than a cut-off feeling.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;working-across-timezones&quot;&gt;Working across timezones&lt;/h2&gt;
+&lt;p&gt;Working with a team in a significantly different time zone is harder! Some tips&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;(All of the above especially hipchat can help)&lt;/li&gt;
+  &lt;li&gt;A daily standup with the whole team is really really useful if you can schedule one. It will also turn into your slot for asking the PM or tech lead all your stored up questions on things you got stuck on! (Obviously ask after the standup unless is relevant to the whole team.) This works fine, but make sure they (and you) are prepared for a potential chat of 10-30 minutes after standup each day.&lt;/li&gt;
+  &lt;li&gt;Keep using retros (or standups) to ask how it’s going from the team’s point of view (or find another way to keep checking) as you might not get feedback otherwise. “is everyone happy with the later standup time slot” “is everyone usually aware of what I’m working on” “is my progress visible” etc.&lt;/li&gt;
+  &lt;li&gt;Throughout the day you’ll get stuck or blocked – much more stuck than you would in an office with people around to go pester for what you need. So it’s important to have a broad backlog of things you can work on. This might mean having 2 or 3 stories lined up, or having a backlog of non-urgent technical debt type tasks you can pick up if you get stuck, which are low enough priority to leave indefinitely if you don’t. And it’s important to make the most of whatever overlap you have with the team each day!&lt;/li&gt;
+  &lt;li&gt;On the plus side, if there are urgent tasks then with a careful handover each morning/night, you can work on them while the other dev assigned to it is in bed. So you can add resource even to a one-man task, if you see what I mean. I think this only works in certain circumstances though!&lt;/li&gt;
+  &lt;li&gt;If you finish your day before the team start theirs, then a quick summary email of where you got up to and a heads up of what your blockers/questions will be at standup is very useful for them.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;location-requirements&quot;&gt;Location requirements&lt;/h2&gt;
+&lt;p&gt;Finally this is really obvious but you’ll need a good computer and a good internet connection wherever you are.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;If you’re moving in to new accommodation, make sure you have a backup plan in case the internet company screw around for ages before connecting you: local libraries or coffee shops are good places to try for free wifi!&lt;/li&gt;
+  &lt;li&gt;Consider using a mobile phone network who give you free access to wifi hotspots (I think O2 does this in the UK, or Telecom in NZ), or one with cheap data bolt-ons that can take you up to at least a few GB a month, at least until you have a stable internet connection. Then you can connect your laptop to the hotspots, or tether it to your phone when you’re desperate.&lt;/li&gt;
+&lt;/ul&gt;
+
+</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Quick tip: Adding NPM dependencies</title>
+      <link>http://swilson.co.uk/blog/2014/08/21/adding-npm-dependencies/</link>
+      <pubDate>Thu, 21 Aug 2014 00:00:00 +0000</pubDate>
+      <author>simon.wilson@softwire.com (Simon Wilson)</author>
+      <guid>http://swilson.co.uk/blog/2014/08/21/adding-npm-dependencies</guid>
+      <description>&lt;p&gt;Just a quick tip. If you’re learning node you don’t usually see this on the tutorials, so you might not know it. When you install a new NPM dependency for your project, like this&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;npm install module&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Then you also need to manually add it to package.json, so that anyone else can run npm install and run your code. You need to manually figure out which version(s) your project depends on. Instead try&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;npm install module --save &lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Which adds the dependency to package.json automatically. Nice.&lt;/p&gt;
+</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>WDCNZ Mega-Short Summary</title>
+      <link>http://swilson.co.uk/blog/2014/08/14/wdcnz-mega-short/</link>
+      <pubDate>Thu, 14 Aug 2014 00:00:00 +0000</pubDate>
+      <author>simon.wilson@softwire.com (Simon Wilson)</author>
+      <guid>http://swilson.co.uk/blog/2014/08/14/wdcnz-mega-short</guid>
+      <description>&lt;p&gt;Last month I went to the Wellington web dev conference &lt;a href=&quot;http://wdcnz.co.nz&quot;&gt;WDCNZ&lt;/a&gt; and it was truely awesome. The main themes that stood out are these:&lt;/p&gt;
+
+&lt;h4 id=&quot;design-your-things-in-small-bits&quot;&gt;Design your things in small bits&lt;/h4&gt;
+&lt;p&gt;Be they components, modules, packages or plugins, you should architecture your things in a way that allows bits to be easily added and replaced. In javascript (the language of the moment), this is made easy by NPM, require.js and common.js. Microservices weren’t actually mentioned, but they’re very popular at the moment and another example of the same philosophy. &lt;a href=&quot;https://twitter.com/substack&quot;&gt;James Halliday&lt;/a&gt; showed us a range of modular tools on the command line and in NPM, and &lt;a href=&quot;https://twitter.com/MarkDalgleish&quot;&gt;Mark Dalgliesh&lt;/a&gt; took us through the modular ecosystem he created around Bespoke.js.&lt;/p&gt;
+
+&lt;h4 id=&quot;everyone-is-using-node&quot;&gt;Everyone is using Node&lt;/h4&gt;
+&lt;p&gt;In a city which superficially appears to use only .NET and Java, almost every speaker was using Node either for their job, their side projects, their robots, or in some cases just for their slides. Browserify means node modules can work on the browser too, so “javascript” means “node” now.&lt;/p&gt;
+
+&lt;h4 id=&quot;build-yourself-some-awesome-hardware-and-programme-it&quot;&gt;Build yourself some awesome hardware and programme it&lt;/h4&gt;
+&lt;p&gt;This was made to look easier than you might think. Get some random lights or motors, connect them to an Arduino, glue on a Rasberry Pi to provide a wifi link and/or web interface, and the rest is just code. We saw &lt;a href=&quot;https://twitter.com/sarajchipps&quot;&gt;Sara Chipps&lt;/a&gt;’ programmable jewellery and &lt;a href=&quot;https://twitter.com/sehsarah&quot;&gt;Sarah Hui&lt;/a&gt;’s nodebot in action.&lt;/p&gt;
+
+&lt;p&gt;Other highlights were &lt;a href=&quot;https://twitter.com/antiheroine&quot;&gt;Jen Myers&lt;/a&gt;’ vision of anti-expertism in the industry, and the sheer blistering pace of &lt;a href=&quot;https://twitter.com/substack&quot;&gt;James Halliday&lt;/a&gt;’s live code demos.&lt;/p&gt;
+
+&lt;p&gt;Look out for a more detailed review coming up on the &lt;a href=&quot;http://www.softwire.com/blog&quot;&gt;Softwire blog&lt;/a&gt; soon!&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/lanyard.jpg&quot; alt=&quot;Proof I was there&quot; /&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    
+
+  </channel>
+</rss>
